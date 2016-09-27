@@ -17,6 +17,7 @@ cfg = Config('ckan.ini')
 # Adds a mod to CKAN
 @route('/api/mods/<gameshort>/<modid>/add_ckan', methods=['POST'])
 @user_has('mods-edit', params=['gameshort', 'modid'])
+@with_session
 def add_ckan(gameshort, modid):
     # Checks
     if not modid.isdigit() or not Mod.query.filter(Mod.id == int(modid)).first():
