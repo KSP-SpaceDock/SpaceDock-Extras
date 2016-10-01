@@ -20,19 +20,23 @@ cfg = Config('ckan.ini')
 @with_session
 def add_ckan(gameshort, modid):
     # Checks
+    if not gameshort == cfg['ksp_gameshort']:
+        return {'error': True, 'reasons': ['It\'s called KERBAL Archive Network, right?']}, 400
     if not modid.isdigit() or not Mod.query.filter(Mod.id == int(modid)).first():
         return {'error': True, 'reasons': ['The modid is invalid']}, 400
     if not Mod.query.filter(Mod.id == int(modid)).filter(Mod.game_id == game_id(gameshort)).first():
         return {'error': True, 'reasons': ['The gameshort is invalid.']}, 400
-		
-	# Find the mod
-	mod = Mod.query.filter(Mod.id == int(modid)).first()
-	
-	# Add to CKAN
-	mod['ckan'] = True
-	url = add_to_ckan(mod)
-	return {'error': False, 'count': 1, 'data': url}
-	
+
+    # Find the mod
+    mod = Mod.query.filter(Mod.id == int(modid)).first()
+    if not mod.published:
+        return {'error': True, 'reasons': ['The mod needs to be published for being added to CKAN']}, 400
+    
+    # Add to CKAN
+    mod['ckan'] = True
+    url = add_to_ckan(mod)
+    return {'error': False, 'count': 1, 'data': url}
+
 
 def add_to_ckan(mod):
     if not cfg['netkan_repo_path']:
@@ -81,13 +85,12 @@ Please direct questions about this pull request to [{0}]({4}{3}).
     sdcfg["protocol"] + "://" + sdcfg["domain"],\
     mod.description, mod.short_description,\
     mod.license, mod.external_link))
-	return p.url
-	
+    return p.url
+
 def create_mod_url(id, name):
     route = cfg['mod-url']
     return route.replace('{id}', str(id)).replace('{name}', name) # Using manual replacement here, so users dont need to use both values
-	
+
 def create_profile_url(id, name):
     route = cfg['profile-url']
     return route.replace('{id}', str(id)).replace('{name}', name) # Using manual replacement here, so users dont need to use both values
-	
