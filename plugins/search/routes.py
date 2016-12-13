@@ -6,6 +6,7 @@
 # Depends: search/algorithm.py
 
 from flask import request
+from flask_login import current_user
 from sqlalchemy import desc
 from SpaceDock.formatting import feature_info, mod_info
 from SpaceDock.objects import Featured, Game, Mod
@@ -72,10 +73,14 @@ def grab_mods(gameshort, site, count):
     top = search_mods(ga,"", site + 1, count)[:count][0]
     new = Mod.query.filter(Mod.published, Mod.game_id == ga.id).order_by(desc(Mod.created)).all()[magic:count]
     updated = Mod.query.filter(Mod.published, Mod.game_id == ga.id, Mod.updated != Mod.created).order_by(desc(Mod.updated)).all()[magic:count]
+    yours = []
+    if current_user:
+        yours = sorted(current_user.following, key=lambda m: m.updated, reverse=True)[magic:count]
     data = {
         'featured': [feature_info(f) for f in featured],
         'top': [mod_info(m) for m in top],
         'new': [mod_info(m) for m in new],
-        'updated': [mod_info(m) for m in updated]
+        'updated': [mod_info(m) for m in updated],
+        'yours': [mod_info(m) for m in yours]
     }
     return {'error': False, 'count': count, 'data': data}
