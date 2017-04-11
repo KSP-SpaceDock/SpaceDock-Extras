@@ -1,0 +1,12 @@
+# The path to your fork of the NetKAN repository
+netkan-repo-path: ""
+
+# Github account data
+github-user: ""
+github-pass: ""
+
+# The gameshort of KSP
+ksp-gameshort: ""
+
+# The default profile url for the frontend
+profile-url: ""
