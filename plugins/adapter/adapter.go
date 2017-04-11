@@ -11,12 +11,13 @@ import (
     "SpaceDock"
     "SpaceDock/routes"
     "SpaceDock/utils"
+    "SpaceDock/objects"
     "github.com/spf13/cast"
     "gopkg.in/kataras/iris.v6"
 )
 
 func init() {
-    Register(GET, "/api/adapter/mods/:modid", mods_adapter)
+    routes.Register(routes.GET, "/api/adapter/mods/:modid", mods_adapter)
 }
 
 /*
