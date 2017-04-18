@@ -12,8 +12,6 @@ import (
     "SpaceDock/utils"
 )
 
-package transformers
-
 func init() {
     utils.RegisterDataTransformer(TransformMod)
 }

@@ -70,10 +70,10 @@ func (s ByUpdated) Len() int {
     return len(*(s.values))
 }
 func (s ByUpdated) Swap(i, j int) {
-    s.values[i], s.values[j] = s.values[j], s.values[i]
+    (*(s.values))[i], (*(s.values))[j] = (*(s.values))[j], (*(s.values))[i]
 }
 func (s ByUpdated) Less(i, j int) bool {
-    return s.values[i].UpdatedAt.Before(s.values[j].UpdatedAt)
+    return (*(s.values))[i].UpdatedAt.Before((*(s.values))[j].UpdatedAt)
 }
 
 func forEach(data []objects.Mod, f func(interface{}) map[string]interface{}) []interface{} {
