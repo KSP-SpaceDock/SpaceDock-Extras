@@ -26,10 +26,10 @@ func (s ByWeight) Len() int {
     return len(*(s.values))
 }
 func (s ByWeight) Swap(i, j int) {
-    s.values[i], s.values[j] = s.values[j], s.values[i]
+    (*(s.values))[i], (*(s.values))[j] = (*(s.values))[j], (*(s.values))[i]
 }
 func (s ByWeight) Less(i, j int) bool {
-    return weightResult(&(s.values[i]), s.terms) < weightResult(&(s.values[j]), s.terms)
+    return weightResult(&((*(s.values))[i]), s.terms) < weightResult(&((*(s.values))[j]), s.terms)
 }
 
 func weightResult(result *objects.Mod, terms []string) float64 {
@@ -98,11 +98,7 @@ func searchMods(game *objects.Game, text string, page float64, limit int) ([]obj
             queries = append(queries, "mod.download_count > " + cast.ToString(cast.ToInt(term[11:])))
         } else if strings.HasPrefix(term, "downloads:<") {
             queries = append(queries, "mod.download_count < " + cast.ToString(cast.ToInt(term[11:])))
-        } /*else if strings.HasPrefix(term, "follower:>") {
-            query = query.Where("mod.follower_count > ?", cast.ToInt(term[11:]))
-        } else if strings.HasPrefix(term, "follower:>") {
-            query = query.Where("mod.follower_count > ?", cast.ToInt(term[11:]))
-        }*/ else {
+        } else {
             queries = append(queries, "LOWER(mods.name) LIKE '%" + strings.ToLower(term) + "%'")
             queries = append(queries, "LOWER(users.username) LIKE '%" + strings.ToLower(term) + "%'")
             queries = append(queries, "LOWER(mods.short_description) LIKE '%" + strings.ToLower(term) + "%'")

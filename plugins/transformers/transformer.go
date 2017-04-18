@@ -17,7 +17,7 @@ func init() {
 }
 
 func TransformMod(data interface{}, m map[string]interface{}) {
-    if mod, ok := data.(objects.Mod); ok {
+    if mod, ok := data.(*objects.Mod); ok {
         m["follower_count"] = len(mod.Followers)
         m["author"] = mod.User.Username
     }

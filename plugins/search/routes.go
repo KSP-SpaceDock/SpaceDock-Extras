@@ -35,7 +35,7 @@ func browse_mod(ctx *iris.Context) {
     site := ctx.URLParam("site")
 
     // Get Data
-    data, status := grabMods(gameshort, site, count)
+    data, status := grabMods(ctx, gameshort, site, count)
     utils.WriteJSON(ctx, status, data)
 }
 
@@ -52,7 +52,7 @@ func browse_mod_mode(ctx *iris.Context) {
     site := ctx.URLParam("site")
 
     // Get Data
-    data, status := grabMods(gameshort, site, count)
+    data, status := grabMods(ctx, gameshort, site, count)
 
     // Errorcheck
     if _,ok := data[mode]; !ok {
@@ -92,7 +92,7 @@ func forEachFeatured(data []objects.Featured, f func(interface{}) map[string]int
     return result
 }
 
-func grabMods(gameshort string, site_ string, count_ string) (iris.Map, int) {
+func grabMods(ctx *iris.Context, gameshort string, site_ string, count_ string) (iris.Map, int) {
     game := &objects.Game{}
     SpaceDock.Database.Where("short = ?", gameshort).First(game)
     if game.Short != gameshort {
