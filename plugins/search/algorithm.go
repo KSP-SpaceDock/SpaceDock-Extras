@@ -119,7 +119,7 @@ func searchMods(game *objects.Game, text string, page float64, limit int) ([]obj
         page = 1
     }
     sort.Sort(sort.Reverse(ByWeight{values:&results,terms:terms}))
-    return results[(int(page) - 1) * limit:int(page) * limit], total
+    return results[(int(page) - 1) * limit:int(math.Min(float64(int(page) * limit), float64(cap(results))))], total
 }
 
 func searchUsers(text string, page float64) []objects.User {

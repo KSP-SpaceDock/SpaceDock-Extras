@@ -101,11 +101,11 @@ func grabMods(ctx *iris.Context, gameshort string, site_ string, count_ string) 
 
     // Params
     site := 0
-    if s,err := cast.ToIntE(site_); err == nil {
+    if s, err := cast.ToIntE(site_); err == nil {
         site = s - 1
     }
     count := 6
-    if c,err := cast.ToIntE(count_); err == nil {
+    if c, err := cast.ToIntE(count_); err == nil {
         count = c
     }
 
@@ -121,31 +121,42 @@ func grabMods(ctx *iris.Context, gameshort string, site_ string, count_ string) 
         Where("mods.game_id = ?", game.ID).
         Order("featured.created_at DESC").
         Find(&featured)
-    featured = featured[magic:count]
-    top,_ := searchMods(game, "", float64(site + 1), count)
-    top = top[:count]
+    if cap(featured) > count {
+        featured = featured[magic:count]
+    }
+    top, _ := searchMods(game, "", float64(site+1), count)
+    if cap(top) > count {
+        top = top[:count]
+    }
     new := []objects.Mod{}
     SpaceDock.Database.Where("published = ?", true).Where("game_id = ?", game.ID).Order("created_at DESC").Find(&new)
-    new = new[magic:count]
+    if cap(new) > count {
+        new = new[magic:count]
+    }
     updated := []objects.Mod{}
     SpaceDock.Database.Where("published = ?", true).
         Where("game_id = ?", game.ID).
         Where("created_at != updated_at").
         Order("updated_at DESC").
         Find(&new)
-    updated = updated[magic:count]
+    if cap(updated) > count {
+        updated = updated[magic:count]
+    }
     current_user := middleware.CurrentUser(ctx)
-    yours := current_user.Following
+    yours := []objects.Mod{}
     if current_user != nil {
-        sort.Sort(sort.Reverse(ByUpdated{values:&yours}))
+        yours = current_user.Following
+    }
+    sort.Sort(sort.Reverse(ByUpdated{values: &yours}))
+    if cap(yours) > count {
         yours = yours[magic:count]
     }
-    data := iris.Map {
+    data := iris.Map{
         "featured": forEachFeatured(featured, utils.ToMap),
-        "top": forEach(top, utils.ToMap),
-        "new": forEach(new, utils.ToMap),
-        "updated": forEach(updated, utils.ToMap),
-        "yours": forEach(yours, utils.ToMap),
+        "top":      forEach(top, utils.ToMap),
+        "new":      forEach(new, utils.ToMap),
+        "updated":  forEach(updated, utils.ToMap),
+        "yours":    forEach(yours, utils.ToMap),
     }
     return data, iris.StatusOK
 }
