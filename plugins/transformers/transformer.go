@@ -8,15 +8,16 @@
 package transformers
 
 import (
+    "SpaceDock"
     "SpaceDock/objects"
     "SpaceDock/utils"
 )
 
 func init() {
-    utils.RegisterDataTransformer(TransformMod)
+    utils.RegisterDataTransformer(Transform)
 }
 
-func TransformMod(data interface{}, m map[string]interface{}) {
+func Transform(data interface{}, m map[string]interface{}) {
     if mod, ok := data.(*objects.Mod); ok {
         m["follower_count"] = len(mod.Followers)
         m["author"] = mod.User.Username
@@ -24,5 +25,17 @@ func TransformMod(data interface{}, m map[string]interface{}) {
     if mod, ok := data.(objects.Mod); ok {
         m["follower_count"] = len(mod.Followers)
         m["author"] = mod.User.Username
+    }
+    if _, ok := data.(*objects.Featured); ok {
+        mod := &objects.Mod{}
+        SpaceDock.Database.Where("id = ?", m["mod_id"]).First(mod)
+        (m["mod"].(map[string]interface{}))["follower_count"] = len(mod.Followers)
+        (m["mod"].(map[string]interface{}))["author"] = mod.User.Username
+    }
+    if _, ok := data.(objects.Featured); ok {
+        mod := &objects.Mod{}
+        SpaceDock.Database.Where("id = ?", m["mod_id"]).First(mod)
+        (m["mod"].(map[string]interface{}))["follower_count"] = len(mod.Followers)
+        (m["mod"].(map[string]interface{}))["author"] = mod.User.Username
     }
 }
