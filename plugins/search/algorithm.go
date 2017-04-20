@@ -108,7 +108,7 @@ func searchMods(game *objects.Game, text string, page float64, limit int) ([]obj
         query = query.Where("mods.game_id = ?", game.ID)
     }
     query = query.Where("(" + strings.Join(queries, " OR ") + ")")
-    query = query.Where("mods.published = ?", true)
+    query = query.Where("mods.published = ?", true).Group("mods.id")
     query.Find(&results)
 
     total := math.Ceil(float64(len(results)) / float64(limit))
