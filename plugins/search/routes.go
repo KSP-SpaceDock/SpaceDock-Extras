@@ -36,7 +36,7 @@ func browse_mod(ctx *iris.Context) {
 
     // Get Data
     data, status := grabMods(ctx, gameshort, site, count)
-    utils.WriteJSON(ctx, status, data)
+    utils.WriteJSON(ctx, status, iris.Map{"error": false, "count": count, "data": data})
 }
 
 /*
@@ -59,7 +59,7 @@ func browse_mod_mode(ctx *iris.Context) {
         utils.WriteJSON(ctx, iris.StatusBadRequest, utils.Error("Invalid mode.").Code(3900))
         return
     }
-    utils.WriteJSON(ctx, status, data[mode])
+    utils.WriteJSON(ctx, status, iris.Map{"error": false, "count": count, "data": data[mode]})
 }
 
 type ByUpdated struct {
