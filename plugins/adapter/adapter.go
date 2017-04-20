@@ -36,5 +36,9 @@ func mods_adapter(ctx *iris.Context) {
         utils.WriteJSON(ctx, iris.StatusNotFound, utils.Error("The modid is invalid").Code(2130))
         return
     }
+    if ctx.URLParam("callback") != "" {
+        ctx.Redirect("/api/mods/" + mod.Game.Short + "/" + cast.ToString(modid) + "?callback=" + ctx.URLParam("callback"), iris.StatusPermanentRedirect)
+        return
+    }
     ctx.Redirect("/api/mods/" + mod.Game.Short + "/" + cast.ToString(modid), iris.StatusPermanentRedirect)
 }
