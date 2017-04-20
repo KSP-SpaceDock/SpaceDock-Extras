@@ -117,9 +117,9 @@ func grabMods(ctx *iris.Context, gameshort string, site_ string, count_ string) 
 
     // Get the mods
     featured := []objects.Featured{}
-    SpaceDock.Database.Joins("JOIN mods ON mod.id = featured.mod_id").
+    SpaceDock.Database.Joins("JOIN mods ON mod.id = featureds.mod_id").
         Where("mods.game_id = ?", game.ID).
-        Order("featured.created_at DESC").
+        Order("featureds.created_at DESC").
         Find(&featured)
     if cap(featured) > count {
         featured = featured[magic:count]

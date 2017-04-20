@@ -83,7 +83,7 @@ func searchMods(game *objects.Game, text string, page float64, limit int) ([]obj
     terms := strings.Split(text, " ")
     results := []objects.Mod{}
     query := SpaceDock.Database.Joins("JOIN users ON users.id = mods.user_id").
-        Joins("JOIN mod_versions ON mod_versions.mod_id = mod.id").
+        Joins("JOIN mod_versions ON mod_versions.mod_id = mods.id").
         Joins("JOIN games ON games.id = mods.game_id").
         Joins("JOIN game_versions ON game_versions.id = mod_versions.game_version_id")
     queries := []string{}
