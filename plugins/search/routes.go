@@ -116,11 +116,13 @@ func grabMods(ctx *iris.Context, gameshort string, site_ string, count_ string) 
     }
 
     // Get the mods
+    SpaceDock.DBRecursionMax += 1
     featured := []objects.Featured{}
     SpaceDock.Database.Joins("JOIN mods ON mods.id = featureds.mod_id").
         Where("mods.game_id = ?", game.ID).
         Order("featureds.created_at DESC").
         Find(&featured)
+    SpaceDock.DBRecursionMax -= 1
     if cap(featured) > count {
         featured = featured[magic:count]
     }
