@@ -9,6 +9,7 @@ package adapter
 
 import (
     "SpaceDock"
+    "SpaceDock/middleware"
     "SpaceDock/objects"
     "SpaceDock/routes"
     "SpaceDock/utils"
