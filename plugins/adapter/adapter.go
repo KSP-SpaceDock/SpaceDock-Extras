@@ -9,15 +9,15 @@ package adapter
 
 import (
     "SpaceDock"
+    "SpaceDock/objects"
     "SpaceDock/routes"
     "SpaceDock/utils"
-    "SpaceDock/objects"
     "github.com/spf13/cast"
     "gopkg.in/kataras/iris.v6"
 )
 
 func init() {
-    routes.Register(routes.GET, "/api/adapter/mods/:modid", mods_adapter)
+    routes.Register(routes.GET, "/api/adapter/mods/:modid", middleware.Recursion(0), mods_adapter)
 }
 
 /*
@@ -36,6 +36,7 @@ func mods_adapter(ctx *iris.Context) {
         utils.WriteJSON(ctx, iris.StatusNotFound, utils.Error("The modid is invalid").Code(2130))
         return
     }
+    SpaceDock.Database.Model(mod).Related(&(mod.Game), "Game")
     if ctx.URLParam("callback") != "" {
         ctx.Redirect("/api/mods/" + mod.Game.Short + "/" + cast.ToString(modid) + "?callback=" + ctx.URLParam("callback"), iris.StatusPermanentRedirect)
         return
