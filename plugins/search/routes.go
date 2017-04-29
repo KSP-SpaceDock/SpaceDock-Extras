@@ -19,8 +19,8 @@ import (
 )
 
 func init() {
-    routes.Register(routes.GET, "/api/browse/:gameshort", browse_mod)
-    routes.Register(routes.GET, "/api/browse/:gameshort/:mode", browse_mod_mode)
+    routes.Register(routes.GET, "/api/browse/:gameshort", middleware.Cache, browse_mod)
+    routes.Register(routes.GET, "/api/browse/:gameshort/:mode", middleware.Cache, browse_mod_mode)
 }
 
 /*
