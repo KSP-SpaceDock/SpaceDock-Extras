@@ -8,11 +8,11 @@
 package search
 
 import (
-    "SpaceDock"
-    "SpaceDock/middleware"
-    "SpaceDock/objects"
-    "SpaceDock/routes"
-    "SpaceDock/utils"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/app"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/middleware"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/objects"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/routes"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/utils"
     "github.com/spf13/cast"
     "gopkg.in/kataras/iris.v6"
     "sort"
@@ -94,7 +94,7 @@ func forEachFeatured(data []objects.Featured, f func(interface{}) map[string]int
 
 func grabMods(ctx *iris.Context, gameshort string, site_ string, count_ string) (iris.Map, int) {
     game := &objects.Game{}
-    SpaceDock.Database.Where("short = ?", gameshort).First(game)
+    app.Database.Where("short = ?", gameshort).First(game)
     if game.Short != gameshort {
         return utils.Error("The game does not exist.").Code(2125), iris.StatusNotFound
     }
@@ -116,13 +116,13 @@ func grabMods(ctx *iris.Context, gameshort string, site_ string, count_ string) 
     }
 
     // Get the mods
-    SpaceDock.DBRecursionMax += 1
+    app.DBRecursionMax += 1
     featured := []objects.Featured{}
-    SpaceDock.Database.Joins("JOIN mods ON mods.id = featureds.mod_id").
+    app.Database.Joins("JOIN mods ON mods.id = featureds.mod_id").
         Where("mods.game_id = ?", game.ID).
         Order("featureds.created_at DESC").
         Find(&featured)
-    SpaceDock.DBRecursionMax -= 1
+    app.DBRecursionMax -= 1
     if cap(featured) > count {
         featured = featured[magic:count]
     }
@@ -131,12 +131,12 @@ func grabMods(ctx *iris.Context, gameshort string, site_ string, count_ string) 
         top = top[:count]
     }
     new := []objects.Mod{}
-    SpaceDock.Database.Where("published = ?", true).Where("game_id = ?", game.ID).Order("created_at DESC").Find(&new)
+    app.Database.Where("published = ?", true).Where("game_id = ?", game.ID).Order("created_at DESC").Find(&new)
     if cap(new) > count {
         new = new[magic:count]
     }
     updated := []objects.Mod{}
-    SpaceDock.Database.Where("published = ?", true).
+    app.Database.Where("published = ?", true).
         Where("game_id = ?", game.ID).
         Where("created_at != updated_at").
         Order("updated_at DESC").
