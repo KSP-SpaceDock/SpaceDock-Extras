@@ -8,9 +8,9 @@
 package transformers
 
 import (
-    "SpaceDock"
-    "SpaceDock/objects"
-    "SpaceDock/utils"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/app"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/objects"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/utils"
 )
 
 func init() {
@@ -30,14 +30,14 @@ func Transform(data interface{}, m map[string]interface{}) {
     }
     if _, ok := data.(*objects.Featured); ok {
         mod := &objects.Mod{}
-        SpaceDock.Database.Where("id = ?", m["mod_id"]).First(mod)
+        app.Database.Where("id = ?", m["mod_id"]).First(mod)
         (m["mod"].(map[string]interface{}))["follower_count"] = len(mod.Followers)
         (m["mod"].(map[string]interface{}))["author"] = mod.User.Username
         (m["mod"].(map[string]interface{}))["game_short"] = mod.Game.Short
     }
     if _, ok := data.(objects.Featured); ok {
         mod := &objects.Mod{}
-        SpaceDock.Database.Where("id = ?", m["mod_id"]).First(mod)
+        app.Database.Where("id = ?", m["mod_id"]).First(mod)
         (m["mod"].(map[string]interface{}))["follower_count"] = len(mod.Followers)
         (m["mod"].(map[string]interface{}))["author"] = mod.User.Username
         (m["mod"].(map[string]interface{}))["game_short"] = mod.Game.Short

@@ -8,8 +8,8 @@
 package search
 
 import (
-    "SpaceDock"
-    "SpaceDock/objects"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/app"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/objects"
     "github.com/spf13/cast"
     "math"
     "sort"
@@ -82,7 +82,7 @@ func weightResult(result *objects.Mod, terms []string) float64 {
 func searchMods(game *objects.Game, text string, page float64, limit int) ([]objects.Mod, float64) {
     terms := strings.Split(text, " ")
     results := []objects.Mod{}
-    query := SpaceDock.Database.Joins("JOIN users ON users.id = mods.user_id").
+    query := app.Database.Joins("JOIN users ON users.id = mods.user_id").
         Joins("JOIN mod_versions ON mod_versions.mod_id = mods.id").
         Joins("JOIN games ON games.id = mods.game_id").
         Joins("JOIN game_versions ON game_versions.id = mod_versions.game_version_id")
@@ -130,7 +130,7 @@ func searchUsers(text string, page float64) []objects.User {
         queries = append(queries, "LOWER(users.username) LIKE '%"+strings.ToLower(term)+"%'")
         queries = append(queries, "LOWER(users.description) LIKE '%"+strings.ToLower(term)+"%'")
     }
-    query := SpaceDock.Database.Where("(" + strings.Join(queries, " OR ") + ")")
+    query := app.Database.Where("(" + strings.Join(queries, " OR ") + ")")
     query = query.Where("users.public = ?", true)
     query.Find(&results)
     return results[(int(page)) * 10:(int(page) * 10) + 10]

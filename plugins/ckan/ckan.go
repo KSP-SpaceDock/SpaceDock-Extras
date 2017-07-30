@@ -8,10 +8,10 @@
 package ckan
 
 import (
-    "SpaceDock"
-    "SpaceDock/middleware"
-    "SpaceDock/objects"
-    "SpaceDock/routes"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/app"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/middleware"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/objects"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/routes"
     "bytes"
     "context"
     "encoding/json"
@@ -38,7 +38,7 @@ type CKANSettings struct {
 var cfg CKANSettings
 
 func init() {
-    SpaceDock.LoadFromConfigFile(&cfg, "ckan.yml")
+    app.LoadFromConfigFile(&cfg, "ckan.yml")
     routes.Register(routes.POST, "/api/mods/:gameshort/:modid/ckan",
         middleware.NeedsPermission("mod-edit", true, "gameshort", "modid"),
         mods_ckan,
@@ -63,7 +63,7 @@ func mods_ckan(ctx *iris.Context) {
 
     // Get the mod
     mod := &objects.Mod{}
-    SpaceDock.Database.Where("id = ?", modid).First(mod)
+    app.Database.Where("id = ?", modid).First(mod)
     if mod.ID != modid {
         utils.WriteJSON(ctx, iris.StatusNotFound, utils.Error("The modid is invalid").Code(2130))
         return
@@ -127,7 +127,7 @@ func AddModToCKAN(mod objects.Mod) string {
     exec.Command("git" ,"fetch", "upstream")
     exec.Command("git", "checkout", "-b", "add-" + json_blob["identifier"], "upstream/master")
     exec.Command("git", "add", "-A")
-    exec.Command("git", "commit", "-m", "Add " + mod.Name + " from " + SpaceDock.Settings.SiteName + "\n\nThis is an automated commit on behalf of " + mod.User.Username, "--author=" + mod.User.Username + " <" + mod.User.Email + ">")
+    exec.Command("git", "commit", "-m", "Add " + mod.Name + " from " + app.Settings.SiteName + "\n\nThis is an automated commit on behalf of " + mod.User.Username, "--author=" + mod.User.Username + " <" + mod.User.Email + ">")
     exec.Command("git", "push", "-u", "origin", "add-" + json_blob["identifier"])
     os.Chdir(olddir)
 
@@ -157,7 +157,7 @@ Please direct questions about this pull request to [{0}]({4}{3}).`))
         "1": mod.Name,
         "2": create_mod_url(mod.ID, mod.Name, modURL),
         "3": create_profile_url(mod.User.ID, mod.User.Username, profileURL),
-        "4": SpaceDock.Settings.Protocol + "://" + SpaceDock.Settings.Domain,
+        "4": app.Settings.Protocol + "://" + app.Settings.Domain,
         "5": mod.Description,
         "6": mod.ShortDescription,
         "7": mod.License,
@@ -174,7 +174,7 @@ Please direct questions about this pull request to [{0}]({4}{3}).`))
     }
     client := github.NewClient(tp.Client())
     p, _, _ := client.PullRequests.Create(context.Background(), "KSP-CKAN", "NetKAN", &github.NewPullRequest{
-        Title: "Add " + mod.Name + " from " + SpaceDock.Settings.SiteName,
+        Title: "Add " + mod.Name + " from " + app.Settings.SiteName,
         Base: &"KSP-CKAN:master",
         Head: &(cfg.GithubUser + ":add-" + json_blob["identifier"]),
         Body: &s,
@@ -185,7 +185,7 @@ Please direct questions about this pull request to [{0}]({4}{3}).`))
 
 func create_mod_url(id uint, name string, modURL string) string {
     if modURL == "" {
-        modURL = SpaceDock.Settings.ModUrl
+        modURL = app.Settings.ModUrl
     }
     return strings.Replace(strings.Replace(modURL, "{id}", strconv.Itoa(int(id)), -1), "{name}", name, -1)
 }
