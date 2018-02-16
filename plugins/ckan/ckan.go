@@ -12,6 +12,7 @@ import (
     "github.com/KSP-SpaceDock/SpaceDock-Backend/middleware"
     "github.com/KSP-SpaceDock/SpaceDock-Backend/objects"
     "github.com/KSP-SpaceDock/SpaceDock-Backend/routes"
+    "github.com/KSP-SpaceDock/SpaceDock-Backend/utils"
     "bytes"
     "context"
     "encoding/json"
@@ -89,7 +90,7 @@ func mods_ckan(ctx *iris.Context) {
     }
 }
 
-func AddModToCKAN(mod objects.Mod) string {
+func AddModToCKAN(mod *objects.Mod) string {
     if cfg.NetkanRepoPath == "" {
         return ""
     }
@@ -155,8 +156,8 @@ Please direct questions about this pull request to [{0}]({4}{3}).`))
     data := map[string]string {
         "0": mod.User.Username,
         "1": mod.Name,
-        "2": create_mod_url(mod.ID, mod.Name, modURL),
-        "3": create_profile_url(mod.User.ID, mod.User.Username, profileURL),
+        "2": create_mod_url(mod.ID, mod.Name, cast.ToString(modURL)),
+        "3": create_profile_url(mod.User.ID, mod.User.Username, cast.ToString(profileURL)),
         "4": app.Settings.Protocol + "://" + app.Settings.Domain,
         "5": mod.Description,
         "6": mod.ShortDescription,
@@ -173,12 +174,16 @@ Please direct questions about this pull request to [{0}]({4}{3}).`))
         Password: cfg.GithubPass,
     }
     client := github.NewClient(tp.Client())
+    title := "Add " + mod.Name + " from " + app.Settings.SiteName
+    base := "KSP-CKAN:master"
+    head := cfg.GithubUser + ":add-" + json_blob["identifier"]
+    maintainerCanModify := true
     p, _, _ := client.PullRequests.Create(context.Background(), "KSP-CKAN", "NetKAN", &github.NewPullRequest{
-        Title: "Add " + mod.Name + " from " + app.Settings.SiteName,
-        Base: &"KSP-CKAN:master",
-        Head: &(cfg.GithubUser + ":add-" + json_blob["identifier"]),
+        Title: &title,
+        Base: &base,
+        Head: &head,
         Body: &s,
-        MaintainerCanModify: &true,
+        MaintainerCanModify: &maintainerCanModify,
     })
     return *p.URL
 }
